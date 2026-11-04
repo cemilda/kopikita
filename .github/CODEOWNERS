@@ -1,0 +1,14 @@
+# Berkas sensitif wajib di-review pemiliknya (Lab L3.4).
+# Ganti @kelas/keamanan dan @kelas/platform dengan tim nyata di organisasi kelas.
+
+# Berkas yang mengarahkan agen AI
+/CLAUDE.md            @kelas/keamanan
+/.claude/            @kelas/keamanan
+/.mcp.json           @kelas/keamanan
+
+# Pipeline dan berkas yang dieksekusi otomatis
+/.github/            @kelas/platform
+/Dockerfile          @kelas/platform
+
+# Infrastruktur
+/infra/              @kelas/platform

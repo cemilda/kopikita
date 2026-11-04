@@ -19,27 +19,34 @@ variable "region" {
   default = "ap-southeast-3"
 }
 
+variable "admin_cidr" {
+  type    = string
+  default = "10.0.0.0/8"
+}
+
 resource "aws_s3_bucket" "menu_assets" {
   bucket = "kopikita-menu-assets-lab"
 }
 
-# RENTAN: bucket bisa dibaca publik
-resource "aws_s3_bucket_acl" "menu_assets" {
-  bucket = aws_s3_bucket.menu_assets.id
-  acl    = "public-read"
+resource "aws_s3_bucket_public_access_block" "menu_assets" {
+  bucket                  = aws_s3_bucket.menu_assets.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_security_group" "api" {
   name        = "kopikita-api"
   description = "Akses ke server API KopiKita"
 
-  # RENTAN: SSH terbuka ke seluruh internet
+  # SSH hanya dari CIDR kantor/VPN (ganti dengan rentang Anda).
   ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.admin_cidr]
   }
 
   ingress {
@@ -59,9 +66,9 @@ resource "aws_security_group" "api" {
   }
 }
 
-# RENTAN: volume data tidak dienkripsi
+# Volume data dienkripsi at rest (CKV_AWS_3).
 resource "aws_ebs_volume" "data" {
   availability_zone = "ap-southeast-3a"
   size              = 20
-  encrypted         = false
+  encrypted         = true
 }
