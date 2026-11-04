@@ -1,0 +1,7 @@
+{"_catatan": "Data CONTOH untuk test, bukan skor EPSS sungguhan.",
+ "data": [
+  {"cve": "CVE-2099-0001", "epss": "0.50000"},
+  {"cve": "CVE-2099-0002", "epss": "0.01000"},
+  {"cve": "CVE-2099-0003", "epss": "0.40000"},
+  {"cve": "CVE-2099-0004", "epss": "0.02000"}
+ ]}
