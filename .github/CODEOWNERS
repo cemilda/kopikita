@@ -12,3 +12,8 @@
 
 # Infrastruktur
 /infra/              @kelas/platform
+
+# Ditambahkan Lab L4.3: kode agen, skrip gerbang CI, dan kebijakan
+/agent/              @kelas/keamanan
+/scripts/            @kelas/keamanan
+/policy/             @kelas/keamanan

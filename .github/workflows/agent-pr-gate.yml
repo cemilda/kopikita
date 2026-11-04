@@ -1,0 +1,33 @@
+# Gerbang PR buatan agen (Lab L4.3): wajib label ai-generated.
+# Ruleset (.github/rulesets/main-dilindungi.json) menjadikan job ini status check wajib
+# dan mewajibkan satu approval manusia + review code owner sebelum merge.
+name: Gerbang PR agen
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  label-agen:
+    name: label-agen
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR dari agen wajib berlabel ai-generated
+        # Nilai dari event (nama branch, label) dikirim lewat env, BUKAN disisipkan ke skrip:
+        # nama branch bisa diatur penyerang dan menjadi script injection bila ditulis ${{ }} di run.
+        env:
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          HEAD_REF: ${{ github.head_ref }}
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          agen=false
+          [ "$AUTHOR_TYPE" = "Bot" ] && agen=true
+          case "$HEAD_REF" in fix/*|claude/*) agen=true ;; esac
+          if [ "$agen" = true ] && ! printf '%s' "$LABELS" | grep -q '"ai-generated"'; then
+            echo "::error::PR buatan agen (branch fix/* atau claude/*, atau akun Bot) wajib diberi label ai-generated."
+            exit 1
+          fi
+          echo "OK (agen=$agen)"
