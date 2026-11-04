@@ -1,0 +1,28 @@
+# Unggah hasil /claude-security (.sarif) ke tab Security (Demo Sesi 2.3 "dari temuan ke dashboard").
+# Jalankan manual setelah berkas .sarif di-commit (folder hasil scan punya .gitignore sendiri;
+# hapus .gitignore itu bila tim ingin menyimpan hasil scan sebagai jejak audit).
+name: Unggah SARIF Claude Security
+
+on:
+  workflow_dispatch:
+    inputs:
+      sarif_file:
+        description: "Path berkas .sarif hasil /claude-security di repo"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          # Input dipakai di `with:`, bukan disisipkan ke skrip `run:`, jadi aman dari script injection.
+          sarif_file: ${{ inputs.sarif_file }}
+          category: claude-security

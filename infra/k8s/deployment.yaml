@@ -19,4 +19,7 @@ spec:
           ports:
             - containerPort: 5000
           securityContext:
-            privileged: true # RENTAN: kontainer privileged
+            privileged: false
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true

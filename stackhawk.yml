@@ -1,0 +1,42 @@
+# Konfigurasi DAST StackHawk HawkScan untuk KopiKita (Lab L3.2b).
+# openapi.yaml = peta endpoint. Dua profil pengguna (pelanggan A dan B) = syarat
+# business logic testing HawkScan untuk menguji BOLA/BFLA lintas pengguna.
+app:
+  applicationId: ${HAWK_APP_ID}
+  env: Development
+  host: ${APP_HOST:http://localhost:5000}
+  openApiConf:
+    filePath: openapi.yaml
+  authentication:
+    loggedInIndicator: "HTTP.*2[0-9][0-9].*"
+    loggedOutIndicator: "HTTP.*401.*"
+    # Login utama (dipakai untuk pemindaian kerentanan biasa).
+    usernamePassword:
+      type: JSON
+      loginPath: /login
+      usernameField: username
+      passwordField: password
+      scanUsername: ${SCAN_USERNAME:alice}
+      scanPassword: ${SCAN_PASSWORD:alice123}
+    tokenExtraction:
+      type: TOKEN_PATH
+      value: auth.token          # login mengembalikan {"auth": {"token": "..."}}
+    tokenAuthorization:
+      type: HEADER
+      value: Authorization
+      tokenType: Bearer
+    testPath:
+      path: /orders              # hanya 200 bila token valid
+      success: "HTTP.*200.*"
+    # Dua profil: HawkScan membandingkan akses antar-pengguna (BOLA = API1:2023).
+    profiles:
+      - name: pelanggan-a
+        userNamePassword:
+          username: ${SCAN_USERNAME:alice}
+          password: ${SCAN_PASSWORD:alice123}
+      - name: pelanggan-b
+        userNamePassword:
+          username: ${SCAN2_USERNAME:budi}
+          password: ${SCAN2_PASSWORD:budi123}
+hawk:
+  failureThreshold: high         # build gagal bila ada temuan High

@@ -1,0 +1,88 @@
+# DAST terautentikasi pada PR (Demo Sesi 3.2, Lab L3.2b).
+# Aplikasi lab dijalankan di runner, lalu dipindai dari luar.
+#   - job 'zap'      : jalur open source OWASP ZAP API scan, tanpa akun.
+#   - job 'hawkscan' : jalur StackHawk, aktif hanya bila secret HAWK_API_KEY ada.
+# Hanya pindai aplikasi milik sendiri.
+name: DAST
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+      - run: pip install -r api/requirements.txt
+      - name: Jalankan aplikasi lab dan sajikan openapi.yaml
+        run: |
+          python api/db.py
+          nohup python api/app.py > app.log 2>&1 &
+          # Sajikan HANYA openapi.yaml (bukan seluruh repo) untuk dibaca ZAP.
+          mkdir -p /tmp/spec && cp openapi.yaml /tmp/spec/
+          nohup python -m http.server 8081 --bind 127.0.0.1 --directory /tmp/spec > spec.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:5000/health && break; sleep 1; done
+      - name: Login sebagai pelanggan B (token untuk ZAP)
+        run: |
+          TOKEN=$(curl -sf -X POST http://localhost:5000/login \
+            -H 'Content-Type: application/json' \
+            -d '{"username":"budi","password":"budi123"}' \
+            | python -c 'import json,sys; print(json.load(sys.stdin)["auth"]["token"])')
+          echo "::add-mask::$TOKEN"
+          echo "ZAP_AUTH_HEADER_VALUE=Bearer $TOKEN" >> "$GITHUB_ENV"
+      - uses: zaproxy/action-api-scan@5158fe4d9d8fcc75ea204db81317cce7f9e5453d # v0.10.0
+        env:
+          # Variabel autentikasi ZAP: setiap request ke localhost membawa header ini.
+          ZAP_AUTH_HEADER: Authorization
+          ZAP_AUTH_HEADER_SITE: localhost
+        with:
+          format: openapi
+          target: http://localhost:8081/openapi.yaml
+          # ZAP menggagalkan job pada WARN apa pun; aplikasi lab masih punya temuan lain
+          # (mis. SQLi login sebelum L2.3), jadi laporan dibaca sebagai artefak.
+          # Gerbang "gagal bila High" ada di job hawkscan (failureThreshold: high),
+          # dan perbaikan BOLA dijaga oleh test regresi tests/test_bola.py di CI.
+          fail_action: false
+          allow_issue_writing: false
+          artifact_name: zap_scan
+
+  # Konteks secrets tidak tersedia di `if` level job, jadi keberadaannya dicek lewat satu step.
+  cek-hawk:
+    runs-on: ubuntu-latest
+    outputs:
+      ada: ${{ steps.cek.outputs.ada }}
+    steps:
+      - id: cek
+        env:
+          HAWK_API_KEY: ${{ secrets.HAWK_API_KEY }}
+        run: |
+          if [ -n "$HAWK_API_KEY" ]; then echo "ada=true"; else echo "ada=false"; fi >> "$GITHUB_OUTPUT"
+
+  hawkscan:
+    needs: cek-hawk
+    if: needs.cek-hawk.outputs.ada == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+      - run: pip install -r api/requirements.txt
+      - name: Jalankan aplikasi lab
+        run: |
+          python api/db.py
+          nohup python api/app.py > app.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:5000/health && break; sleep 1; done
+      - uses: stackhawk/hawkscan-action@d4e7bbecb55bb61d3c0c07a715c67cf85b468a43 # v3.2.0
+        env:
+          HAWK_APP_ID: ${{ secrets.HAWK_APP_ID }}
+        with:
+          apiKey: ${{ secrets.HAWK_API_KEY }}
+          configurationFiles: stackhawk.yml

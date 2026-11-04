@@ -1,0 +1,26 @@
+# Gerbang policy-as-code lintas cloud dengan Conftest (Lab L4.1).
+name: Policy
+
+on:
+  pull_request:
+    paths: ["infra/**", "policy/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Pasang conftest
+        run: |
+          VER=0.71.1
+          curl -sSL "https://github.com/open-policy-agent/conftest/releases/download/v${VER}/conftest_${VER}_Linux_x86_64.tar.gz" | tar xz conftest
+          sudo mv conftest /usr/local/bin/
+      - name: Uji kebijakan sendiri
+        run: conftest verify -p policy/
+      - name: Terapkan kebijakan ke folder infra/
+        # Conftest mem-parse berkas .tf langsung (HCL2); tidak perlu kredensial cloud.
+        run: conftest test -p policy/ infra/main.tf

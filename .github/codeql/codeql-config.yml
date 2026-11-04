@@ -1,0 +1,3 @@
+name: KopiKita CodeQL config
+paths-ignore:
+  - rules/

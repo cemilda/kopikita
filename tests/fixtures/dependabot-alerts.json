@@ -1,0 +1,14 @@
+[
+  {"number": 1, "dependency": {"package": {"name": "requests"}},
+   "security_advisory": {"cve_id": "CVE-2099-0001", "severity": "medium"},
+   "security_vulnerability": {"first_patched_version": {"identifier": "9.9.1"}}},
+  {"number": 2, "dependency": {"package": {"name": "werkzeug"}},
+   "security_advisory": {"cve_id": "CVE-2099-0002", "severity": "high"},
+   "security_vulnerability": {"first_patched_version": {"identifier": "9.9.2"}}},
+  {"number": 3, "dependency": {"package": {"name": "flask"}},
+   "security_advisory": {"cve_id": "CVE-2099-0003", "severity": "high"},
+   "security_vulnerability": {"first_patched_version": {"identifier": "9.9.3"}}},
+  {"number": 4, "dependency": {"package": {"name": "jinja2"}},
+   "security_advisory": {"cve_id": "CVE-2099-0004", "severity": "medium"},
+   "security_vulnerability": {"first_patched_version": {"identifier": "9.9.4"}}}
+]
