@@ -1,0 +1,10 @@
+{
+  "number": 4,
+  "rule": {"id": "py/clear-text-logging-sensitive-data", "security_severity_level": "high"},
+  "cwe": "CWE-312",
+  "most_recent_instance": {
+    "location": {"path": "api/app.py", "start_line": 76},
+    "message": {"text": "Password dari request dicatat ke log dalam bentuk teks jelas."}
+  },
+  "catatan": "Alert 4 dari catatan triase L1.2. Agen harus menghapus pencatatan password tanpa menghilangkan log percobaan login."
+}
