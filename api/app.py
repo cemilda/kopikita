@@ -20,6 +20,9 @@ log = logging.getLogger("kopikita")
 app = Flask(__name__)
 app.config.from_object(config)
 
+import greeting
+greeting.register(app)
+
 import staff
 staff.register(app)
 
