@@ -20,6 +20,9 @@ log = logging.getLogger("kopikita")
 app = Flask(__name__)
 app.config.from_object(config)
 
+import search
+search.register(app)
+
 import staff
 staff.register(app)
 

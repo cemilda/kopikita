@@ -14,13 +14,19 @@
     ],
     "allow": [
       "Bash(pytest *)",
-      "Bash(npm run test *)"
+      "Bash(npm run test *)",
+      "mcp__semgrep__security_check",
+      "mcp__semgrep__semgrep_scan"
     ]
   },
   "sandbox": {
     "enabled": true,
     "network": {
-      "allowedDomains": ["github.com", "pypi.org", "files.pythonhosted.org"]
+      "allowedDomains": [
+        "github.com",
+        "pypi.org",
+        "files.pythonhosted.org"
+      ]
     }
   },
   "hooks": {
