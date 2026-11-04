@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+!.env.example
+.venv/
+logs/
+**/__pycache__/
+*.db
+node_modules/
+*.sarif
+sbom.json
