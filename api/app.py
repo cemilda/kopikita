@@ -145,6 +145,9 @@ def invoice():
         return fh.read(), 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
+import summary  # noqa: E402
+summary.register(app, get_db, login_required)
+
 if __name__ == "__main__":
     init_db(app.config["DATABASE"])
     app.run(host="127.0.0.1", port=5000)
