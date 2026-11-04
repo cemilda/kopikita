@@ -1,0 +1,5 @@
+INVOICE KOPIKITA #102
+Pelanggan : Budi Santoso
+Item      : Americano x1, Croissant Mentega x1
+Total     : Rp53.000
+Status    : diproses

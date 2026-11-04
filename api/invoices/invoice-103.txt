@@ -1,0 +1,5 @@
+INVOICE KOPIKITA #103
+Pelanggan : Alice Pratama
+Item      : Es Kopi Pandan x1
+Total     : Rp27.000
+Status    : diproses

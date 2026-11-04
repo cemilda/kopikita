@@ -1,0 +1,16 @@
+# RENTAN (Lab L4.3): memakai access key AWS statis berumur panjang.
+name: Deploy aset menu
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-southeast-3
+    steps:
+      - uses: actions/checkout@v7
+      - run: aws s3 sync web/public s3://kopikita-menu-assets-lab --delete

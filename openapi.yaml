@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: KopiKita API (aplikasi latihan, sengaja rentan)
+  version: "1.0.0"
+  description: Dipakai sebagai peta endpoint untuk DAST di Lab L3.2b (HawkScan atau OWASP ZAP).
+servers:
+  - url: http://localhost:5000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Order:
+      type: object
+      properties:
+        id: {type: integer}
+        user_id: {type: integer}
+        items: {type: string}
+        total: {type: integer}
+        status: {type: string}
+paths:
+  /health:
+    get:
+      summary: Status layanan
+      responses:
+        "200": {description: OK}
+  /login:
+    post:
+      summary: Login pelanggan, mengembalikan token di auth.token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: {type: string, example: alice}
+                password: {type: string, example: alice123}
+      responses:
+        "200": {description: Token sesi}
+        "401": {description: Kredensial salah}
+  /products:
+    get:
+      summary: Daftar produk
+      parameters:
+        - in: query
+          name: sort
+          schema: {type: string, enum: [name, price, category]}
+      responses:
+        "200": {description: Daftar produk}
+        "400": {description: Kolom sort tidak diizinkan}
+  /orders:
+    get:
+      summary: Pesanan milik pengguna yang login
+      security: [{bearerAuth: []}]
+      responses:
+        "200": {description: Daftar pesanan}
+        "401": {description: Perlu login}
+  /orders/{orderId}:
+    get:
+      summary: Detail satu pesanan
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: {type: integer, example: 101}
+      responses:
+        "200":
+          description: Detail pesanan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order: {$ref: "#/components/schemas/Order"}
+        "401": {description: Perlu login}
+        "404": {description: Tidak ditemukan}
+  /invoices:
+    get:
+      summary: Unduh invoice pesanan milik sendiri
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: file
+          required: true
+          schema: {type: string, example: invoice-101.txt}
+      responses:
+        "200": {description: Isi invoice}
+        "401": {description: Perlu login}

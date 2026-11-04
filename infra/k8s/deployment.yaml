@@ -1,0 +1,22 @@
+# PERINGATAN: SENGAJA berisi salah konfigurasi untuk Lab L3.4. Jangan di-apply.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kopikita-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kopikita-api
+  template:
+    metadata:
+      labels:
+        app: kopikita-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/OWNER/kopikita-vuln:latest
+          ports:
+            - containerPort: 5000
+          securityContext:
+            privileged: true # RENTAN: kontainer privileged

@@ -1,0 +1,14 @@
+{
+  "name": "kopikita-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend etalase KopiKita (SENGAJA memakai dependensi lama untuk Lab L1.4)",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "4.17.1",
+    "lodash": "4.17.15"
+  }
+}

@@ -1,0 +1,5 @@
+INVOICE KOPIKITA #101
+Pelanggan : Alice Pratama
+Item      : Kopi Susu Gula Aren x2
+Total     : Rp46.000
+Status    : selesai

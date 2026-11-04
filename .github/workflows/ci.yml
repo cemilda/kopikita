@@ -1,0 +1,23 @@
+# RENTAN (Lab L3.2): izin write-all, action tidak dipin ke SHA,
+# dan secret diekspos ke seluruh job padahal tidak dipakai.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions: write-all
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      PAYMENT_API_KEY: ${{ secrets.PAYMENT_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: pip install -r api/requirements.txt -r requirements-dev.txt
+      - run: pytest -q
+      - run: node --test web/

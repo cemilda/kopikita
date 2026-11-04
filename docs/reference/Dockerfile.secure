@@ -1,0 +1,42 @@
+# Pola Dockerfile aman (referensi untuk Lab L3.3)
+#
+# Diadaptasi dari resources/module-05-container/templates/Dockerfile.secure di repo
+# paulasilvatech/Secure-Code-AI-Dev (lisensi MIT). Templat aslinya untuk Node.js;
+# versi ini menerapkan lima praktik yang sama pada aplikasi Python:
+#   1. Tag versi spesifik, bukan latest
+#   2. Pengguna non-root dibuat sejak awal
+#   3. Dependensi produksi saja, cache dibersihkan
+#   4. Tahap scan Trivy di dalam build (target terpisah)
+#   5. Root filesystem read-only + health check (read-only diatur saat runtime)
+
+ARG PYTHON_VERSION=3.11.11
+
+# --- Tahap 1: build (compiler, tool, dan source boleh ada di sini) ---
+FROM python:${PYTHON_VERSION}-slim AS build
+WORKDIR /build
+COPY api/requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# --- Tahap 2 (opsional): scan isi aplikasi sebelum dipublikasikan ---
+# Jalankan dengan: docker build --target security-scan .
+FROM aquasec/trivy:0.76.1 AS security-scan
+COPY --from=build /install /scan/install
+COPY api /scan/api
+RUN trivy filesystem --exit-code 1 --severity HIGH,CRITICAL --no-progress /scan
+
+# --- Tahap 3: runtime (hanya artefak yang dibutuhkan) ---
+FROM python:${PYTHON_VERSION}-slim AS runtime
+RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --no-create-home app
+WORKDIR /app
+COPY --from=build /install /usr/local
+COPY --chown=app:app api/ ./api/
+USER app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2)"
+CMD ["gunicorn", "--chdir", "api", "--bind", "0.0.0.0:5000", "wsgi:app"]
+
+# Saat runtime, jalankan dengan filesystem read-only, mis. di docker-compose:
+#   read_only: true
+#   tmpfs: ["/tmp"]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KopiKita</title>
+  <script src="/config.js"></script>
+</head>
+<body>
+  <h1>KopiKita</h1>
+  <p>Aplikasi latihan pelatihan Secure Code AI Development. Sengaja rentan.</p>
+  <ul id="menu"></ul>
+  <script>
+    fetch(window.KOPIKITA_API + "/products?sort=name")
+      .then((r) => r.json())
+      .then((data) => {
+        const list = document.getElementById("menu");
+        for (const p of data.products) {
+          const li = document.createElement("li");
+          li.textContent = `${p.name} - Rp${p.price.toLocaleString("id-ID")}`;
+          list.appendChild(li);
+        }
+      });
+  </script>
+</body>
+</html>
