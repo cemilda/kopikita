@@ -111,12 +111,13 @@ def my_orders():
 @app.get("/orders/<int:order_id>")
 @login_required
 def order_detail(order_id):
-    # RENTAN: sudah login, tetapi tidak memeriksa pemilik pesanan (BOLA, API1:2023)
     row = get_db().execute(
         "SELECT id, user_id, items, total, status FROM orders WHERE id = ?", (order_id,)
     ).fetchone()
     if row is None:
         abort(404)
+    if row["user_id"] != g.user["id"]:
+        abort(404)  # jangan bocorkan keberadaan pesanan milik orang lain
     return jsonify(order=dict(row))
 
 
