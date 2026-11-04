@@ -1,0 +1,24 @@
+rules:
+  - id: kopikita-sql-taint
+    mode: taint
+    languages: [python]
+    severity: ERROR
+    message: >-
+      Data dari request mengalir ke query SQL tanpa parameter. Gunakan query berparameter
+      (tanda ?) atau, untuk nama kolom ORDER BY, lewatkan dulu ke kopikita.safe_sql().
+    metadata:
+      cwe: "CWE-89: SQL Injection"
+      category: security
+    pattern-sources:
+      - pattern: request.args.get(...)
+      - pattern: request.form[...]
+      # Login KopiKita membaca body JSON, jadi get_json() juga dianggap source.
+      - pattern: request.get_json(...)
+    pattern-sanitizers:
+      # Sanitizer internal tim: allowlist nama kolom.
+      - pattern: kopikita.safe_sql(...)
+    pattern-sinks:
+      - patterns:
+          - pattern: $CUR.execute($Q, ...)
+          # Hanya argumen pertama (teks query) yang berbahaya; parameter di argumen kedua aman.
+          - focus-metavariable: $Q

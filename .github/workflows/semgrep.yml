@@ -1,0 +1,31 @@
+# Rule kustom hanya boleh masuk CI bila punya test yang lulus.
+name: Semgrep (rule kustom)
+
+on:
+  push:
+    branches: [main, "lab/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: pip install semgrep==1.182.0
+      - name: Test rule (wajib lulus)
+        run: semgrep --test rules/
+      - name: Pindai api/ dengan rule tim
+        run: semgrep scan --config rules/ --sarif --output semgrep.sarif api/
+      - uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep-kopikita

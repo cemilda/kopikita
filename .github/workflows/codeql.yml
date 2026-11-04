@@ -1,0 +1,35 @@
+name: CodeQL
+
+on:
+  push:
+    # main + branch lab yang dijadikan default branch fork (lihat docs/labs/README.md)
+    branches: [main, "lab/**"]
+  pull_request:
+  workflow_dispatch: # analisis dasar sekali jalan pada branch start
+  schedule:
+    - cron: "17 1 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
