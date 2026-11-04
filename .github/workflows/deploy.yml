@@ -1,16 +1,21 @@
-# RENTAN (Lab L4.3): memakai access key AWS statis berumur panjang.
+# Deploy aset menu (dikeraskan sebagian di Lab L3.2).
+# L3.2: izin minimal + action dipin ke SHA.
+# Masih tersisa: access key AWS statis. Diganti OIDC di Lab L4.3 (zero-trust).
 name: Deploy aset menu
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # TODO L4.3: ganti OIDC
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ap-southeast-3
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: aws s3 sync web/public s3://kopikita-menu-assets-lab --delete
