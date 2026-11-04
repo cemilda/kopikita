@@ -6,6 +6,7 @@ Hanya jalankan di laptop atau runner CI milik sendiri.
 import functools
 import logging
 import os
+import re
 import secrets
 
 from flask import Flask, abort, g, jsonify, request
@@ -77,14 +78,10 @@ def login():
     username = data.get("username", "")
     password = data.get("password", "")
     log.info(f"login attempt {username} {password}")  # RENTAN: password masuk log
-    cur = get_db().cursor()
-    # RENTAN: query disusun dengan penggabungan string (SQL injection)
-    query = (
-        "SELECT id, username FROM users WHERE username = '" + username + "'"
-        " AND password_hash = '" + kopikita.hash_password(password) + "'"
-    )
-    cur.execute(query)
-    row = cur.fetchone()
+    row = get_db().execute(
+        "SELECT id, username FROM users WHERE username = ? AND password_hash = ?",
+        (username, kopikita.hash_password(password)),
+    ).fetchone()
     if row is None:
         return jsonify(error="username atau password salah"), 401
     token = secrets.token_urlsafe(24)
@@ -127,12 +124,23 @@ def order_detail(order_id):
 @login_required
 def invoice():
     name = request.args.get("file", "")
-    # RENTAN: path traversal, mis. ?file=../config.py
-    path = os.path.join(app.config["INVOICE_DIR"], name)
+    # Hanya nama berkas polos yang diizinkan; tidak boleh ada path.
+    if name != os.path.basename(name) or not re.fullmatch(r"invoice-\d+\.txt", name):
+        abort(400)
+    # Nomor invoice = nomor pesanan: hanya pemilik pesanan yang boleh membacanya.
+    order = get_db().execute(
+        "SELECT user_id FROM orders WHERE id = ?", (re.search(r"\d+", name).group(),)
+    ).fetchone()
+    if order is None or order["user_id"] != g.user["id"]:
+        abort(404)  # jangan bocorkan keberadaan invoice milik orang lain
+    base = os.path.realpath(app.config["INVOICE_DIR"])
+    path = os.path.realpath(os.path.join(base, name))
+    if os.path.commonpath([base, path]) != base or not os.path.isfile(path):
+        abort(404)
     with open(path, encoding="utf-8") as fh:
         return fh.read(), 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
 if __name__ == "__main__":
     init_db(app.config["DATABASE"])
-    app.run(host="0.0.0.0", port=5000, debug=True)  # RENTAN: debugger aktif
+    app.run(host="127.0.0.1", port=5000)
