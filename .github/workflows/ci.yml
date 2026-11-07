@@ -20,4 +20,4 @@ jobs:
           python-version: "3.11"
       - run: pip install -r api/requirements.txt -r requirements-dev.txt
       - run: pytest -q
-      - run: node --test web/
+      - run: npm --prefix web test
