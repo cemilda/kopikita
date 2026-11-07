@@ -43,11 +43,11 @@ maka diff PR hanya berisi perubahan uji itu.
 
 | Branch | Induk (base PR) | Dipakai di | Isi |
 | --- | --- | --- | --- |
-| `aux/L1.4-pr-dependensi-lama` | `lab/L1.4-solution` | L1.4 langkah 3 | Menambah `urllib3==1.26.4` (punya advisory high) ke `api/requirements.txt` |
-| `aux/L2.2-contoh-naif` | `lab/L2.2-start` | L2.2 (cadangan) | Contoh hasil prompt naif `api/staff.py` untuk dibandingkan bila Claude tidak tersedia |
-| `aux/L2.4-pr-xss` | `lab/L2.4-solution` | L2.4 langkah 2 | Endpoint `GET /greeting` yang rentan XSS |
-| `aux/L3.1-komentar-kanari` | `lab/L3.1-solution` | L3.1 langkah 4 | Komentar kode tidak tepercaya berisi instruksi kanari `KANARI-L31` |
-| `aux/L4.3-pr-bidi` | `lab/L4.3-solution` | L4.3 langkah 2 | Berkas berisi karakter bidi dan zero-width tersembunyi |
+| `pr/L1.4-pr-dependensi-lama` | `lab/L1.4-solution` | L1.4 langkah 3 | Menambah `urllib3==1.26.4` (punya advisory high) ke `api/requirements.txt` |
+| `pr/L2.2-contoh-naif` | `lab/L2.2-start` | L2.2 (cadangan) | Contoh hasil prompt naif `api/staff.py` untuk dibandingkan bila Claude tidak tersedia |
+| `pr/L2.4-pr-xss` | `lab/L2.4-solution` | L2.4 langkah 2 | Endpoint `GET /greeting` yang rentan XSS |
+| `pr/L3.1-komentar-kanari` | `lab/L3.1-solution` | L3.1 langkah 4 | Komentar kode tidak tepercaya berisi instruksi kanari `KANARI-L31` |
+| `pr/L4.3-pr-bidi` | `lab/L4.3-solution` | L4.3 langkah 2 | Berkas berisi karakter bidi dan zero-width tersembunyi |
 
 ## Alias demo
 

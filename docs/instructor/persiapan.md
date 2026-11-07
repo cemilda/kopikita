@@ -15,7 +15,7 @@
 
 Repo ini dibangun dan diuji otomatis di lingkungan tanpa akses ke GitHub Actions, Docker, PyPI, dan
 beberapa binary eksternal. Yang **sudah** diverifikasi: semua branch terbangun, `pytest` lulus di semua
-branch (kecuali `aux/L4.3-pr-bidi` yang memang harus gagal), semua YAML/JSON valid, SHA action dicocokkan
+branch (kecuali `pr/L4.3-pr-bidi` yang memang harus gagal), semua YAML/JSON valid, SHA action dicocokkan
 dengan `git ls-remote` ke repo resmi, dan teks slide = teks panduan (`build/check_consistency.py`).
 
 Jalankan sekali di laptop instruktur sebelum kelas:
@@ -37,7 +37,7 @@ Jalankan sekali di laptop instruktur sebelum kelas:
 
 - [ ] Rekam cadangan: hasil scan, PR review Claude, PR agen, issue digest (bila API/jaringan bermasalah).
 - [ ] Jalankan analisis CodeQL dan run workflow untuk demo hari itu (analisis pertama butuh beberapa menit).
-- [ ] Siapkan PR uji demo 10 menit sebelum sesi (`aux/L2.4-pr-xss`, `aux/L4.3-pr-bidi`).
+- [ ] Siapkan PR uji demo 10 menit sebelum sesi (`pr/L2.4-pr-xss`, `pr/L4.3-pr-bidi`).
 
 ## Setelah kelas
 

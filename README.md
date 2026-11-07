@@ -25,7 +25,7 @@ Di UI GitHub: **Fork** → hapus centang *Copy the `main` branch only* agar semu
 | `main` | Aplikasi rentan + semua panduan |
 | `lab/<ID>-start` | Titik mulai lab; sudah berisi hasil lab prasyarat |
 | `lab/<ID>-solution` | Kunci jawaban (commit anak dari start) |
-| `aux/*` | PR uji siap pakai (dependensi lama, XSS, kanari, karakter bidi) |
+| `pr/*` | PR uji siap pakai (dependensi lama, XSS, kanari, karakter bidi) |
 | `demo/settings` | Berkas demo `settings.json` Sesi 2.1 |
 
 ```bash
